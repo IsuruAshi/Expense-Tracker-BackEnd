@@ -35,6 +35,21 @@ async function addTransaction(req:Request,res:Response){
     transaction.id=insertId;
     res.status(201).json(transaction);
 }
-function deleteTransaction(req:Request,res:Response){
+async function deleteTransaction(req:Request,res:Response){
+    const transactionId=+req.params.id;
+    const transaction=<TransactionTo> req.body;
+    const connection= await  pool.getConnection();
+    const [result]=await connection.execute<ResultSetHeader[]>('SELECT * FROM transaction1 WHERE id =? ',[transactionId]);
 
+    if(!result.length){
+        res.sendStatus(404);
+        return;
+    }else{
+        await connection.execute('DELETE FROM transaction1 WHERE id=?',[transactionId])
+    }
+    await connection.execute('UPDATE task SET description =? ,status=? WHERE id=?',
+        [transaction.text,transactionId]
+    );
+
+    pool.releaseConnection(connection);
 }
