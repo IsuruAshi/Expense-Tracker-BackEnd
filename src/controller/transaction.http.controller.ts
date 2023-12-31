@@ -1,7 +1,8 @@
 import {Router} from "express";
 import {Request,Response} from "express-serve-static-core";
-import mysql from 'mysql2/promise'
+import mysql, {ResultSetHeader} from 'mysql2/promise'
 import 'dotenv/config'
+import {TransactionTo} from "../to/transaction.to.js";
 
 
 const controller=Router();
@@ -25,7 +26,15 @@ async function getAllTransactions(req:Request,res:Response){
     res.json(transactions);
     pool.releaseConnection(connection);
 }
-function addTransaction(){}
+async function addTransaction(req:Request,res:Response){
+    const transaction = <TransactionTo>req.body;
+    const connection=await pool.getConnection();
+    const [{insertId}]= await connection.execute<ResultSetHeader>('INSERT INTO transaction1 (text,amount) VALUES (?,?)',
+        [transaction.text,transaction.amount]);
+    pool.releaseConnection(connection);
+    transaction.id=insertId;
+    res.status(201).json(transaction);
+}
 function deleteTransaction(req:Request,res:Response){
 
 }
