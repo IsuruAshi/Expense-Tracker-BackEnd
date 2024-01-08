@@ -7,6 +7,6 @@ app.use(json());
 app.use((req, res, next) => {
     next();
 });
-app.use('/api/v1/transactions', TransactionHttpController);
+app.use('/api/v1/transactions/', TransactionHttpController);
 app.listen(8080, () => console.log('Server is Listening to 8080'));
 //# sourceMappingURL=main.js.map
